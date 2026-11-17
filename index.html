@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>공강 요정 - 공강 시간 맞춤 활동 추천 플래너</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #f3f4f8;
+      color: #1f2937;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 10px 8px;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 390px;
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-height: 90vh;
+    }
+
+    /* 상단 테스트 컨트롤 바 */
+    .test-toolbar {
+      background: #374151;
+      color: #f9fafb;
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+    }
+    .test-toolbar .date-label {
+      font-weight: 600;
+      color: #93c5fd;
+    }
+    .test-toolbar .btn-group {
+      display: flex;
+      gap: 5px;
+    }
+    .test-btn {
+      background: #4b5563;
+      color: #fff;
+      border: 1px solid #6b7280;
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .test-btn:active {
+      background: #6b7280;
+    }
+
+    /* 본문 영역 */
+    .main-content {
+      padding: 14px 14px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* 헤더 */
+    .app-header {
+      text-align: center;
+      padding: 4px 0 2px;
+    }
+    .app-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #4f46e5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .app-subtitle {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 3px;
+    }
+
+    /* 5. 재조율 알림 배너 */
+    .re-adjust-banner {
+      background: #fffbeb;
+      border: 1px solid #fef3c7;
+      border-left: 4px solid #f59e0b;
+      padding: 9px 11px;
+      border-radius: 10px;
+      font-size: 12px;
+      line-height: 1.4;
+      color: #92400e;
+      display: none;
+    }
+
+    /* 4. 모니터링 대시보드 */
+    .monitor-card {
+      background: linear-gradient(135deg, #4f46e5, #6366f1);
+      color: white;
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+    }
+    .monitor-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .badge-level {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      padding: 3px 9px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .stamp-count {
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(0, 0, 0, 0.15);
+      padding: 3px 8px;
+      border-radius: 10px;
+    }
+    .monitor-stats {
+      display: flex;
+      justify-content: space-around;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 8px 6px;
+      text-align: center;
+    }
+    .stat-item .stat-num {
+      font-size: 18px;
+      font-weight: 800;
+    }
+    .stat-item .stat-label {
+      font-size: 10px;
+      opacity: 0.85;
+      margin-top: 1px;
+    }
+
+    /* 카드 공통 스타일 */
+    .section-card {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .section-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* 1. 입력값 선택 섹션 */
+    .btn-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .btn-grid-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .chip-btn {
+      background: #f9fafb;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      padding: 9px 4px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #4b5563;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .chip-btn.active {
+      background: #eef2ff;
+      border-color: #4f46e5;
+      color: #4f46e5;
+      font-weight: 700;
+      box-shadow: 0 0 0 1px #4f46e5 inset;
+    }
+    .chip-btn:active {
+      transform: scale(0.97);
+    }
+
+    .error-msg {
+      color: #dc2626;
+      font-size: 11px;
+      margin-bottom: 8px;
+      display: none;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .btn-primary {
+      width: 100%;
+      background: #4f46e5;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      opacity: 0.6;
+    }
+    .btn-primary.ready {
+      opacity: 1;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+    }
+    .btn-primary:active {
+      background: #4338ca;
+    }
+
+    /* 2. 초안 생성 (추천 활동) */
+    .draft-container {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .draft-toolbar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+    .btn-secondary {
+      flex: 1;
+      background: #f3f4f6;
+      color: #374151;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      padding: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+    }
+    .btn-secondary:active {
+      background: #e5e7eb;
+    }
+
+    .activity-card {
+      border: 1.5px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 12px;
+      background: #fafafa;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+    .activity-card.featured {
+      border-color: #6366f1;
+      background: #f5f3ff;
+    }
+    .activity-card.highlight {
+      animation: pulseHighlight 0.5s 2 ease-in-out;
+      border-color: #ec4899;
+      background: #fdf2f8;
+      box-shadow: 0 0 0 2px #ec4899;
+    }
+    @keyframes pulseHighlight {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+    }
+    .activity-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .activity-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #111827;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .activity-time-tag {
+      font-size: 10px;
+      background: #e0e7ff;
+      color: #3730a3;
+      padding: 2px 6px;
+      border-radius: 8px;
+      font-weight: 600;
+    }
+    .activity-desc {
+      font-size: 11px;
+      color: #4b5563;
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+    .btn-select-act {
+      width: 100%;
+      background: #ffffff;
+      color: #4f46e5;
+      border: 1px solid #4f46e5;
+      border-radius: 8px;
+      padding: 7px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-select-act:active {
+      background: #4f46e5;
+      color: white;
+    }
+
+    /* 내장 미니게임: 반응속도 테스트 */
+    .minigame-box {
+      margin-top: 6px;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      background: #e5e7eb;
+      color: #374151;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .minigame-box.waiting {
+      background: #ef4444;
+      color: white;
+    }
+    .minigame-box.ready {
+      background: #10b981;
+      color: white;
+    }
+
+    /* 3. 실행 기록 섹션 */
+    .record-container {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .selected-mission-card {
+      background: #eef2ff;
+      border: 1.5px solid #818cf8;
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+    }
+    .mission-name {
+      font-size: 15px;
+      font-weight: 800;
+      color: #312e81;
+      margin-bottom: 4px;
+    }
+    .mission-sub {
+      font-size: 12px;
+      color: #4338ca;
+    }
+
+    .satisfaction-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #374151;
+      text-align: center;
+      margin-bottom: 6px;
+    }
+    .satis-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .satis-btn {
+      background: #f9fafb;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      padding: 10px 4px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 11px;
+      color: #4b5563;
+    }
+    .satis-btn .emoji {
+      font-size: 20px;
+      display: block;
+      margin-bottom: 2px;
+    }
+    .satis-btn.active {
+      background: #ecfdf5;
+      border-color: #10b981;
+      color: #065f46;
+      font-weight: 700;
+      box-shadow: 0 0 0 1px #10b981 inset;
+    }
+
+    .btn-cancel-mission {
+      background: none;
+      border: none;
+      color: #6b7280;
+      font-size: 11px;
+      text-decoration: underline;
+      cursor: pointer;
+      padding: 4px;
+      margin-top: 4px;
+      text-align: center;
+    }
+
+    .today-done-box {
+      background: #ecfdf5;
+      border: 1.5px solid #34d399;
+      border-radius: 14px;
+      padding: 16px;
+      text-align: center;
+      display: none;
+    }
+    .done-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #065f46;
+      margin-bottom: 4px;
+    }
+    .done-desc {
+      font-size: 12px;
+      color: #047857;
+      line-height: 1.4;
+    }
+
+    /* 최근 기록 리스트 */
+    .history-card {
+      margin-top: 4px;
+    }
+    .history-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+    }
+    .history-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .history-date {
+      color: #9ca3af;
+      font-size: 10px;
+    }
+    .history-title {
+      font-weight: 600;
+      color: #1f2937;
+    }
+    .history-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 700;
+    }
+    .btn-delete-rec {
+      background: none;
+      border: none;
+      color: #ef4444;
+      font-size: 11px;
+      cursor: pointer;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+    .btn-delete-rec:hover {
+      background: #fee2e2;
+    }
+    .empty-history {
+      font-size: 11px;
+      color: #9ca3af;
+      text-align: center;
+      padding: 10px 0;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- 상단 테스트 도구 바 -->
+  <div class="test-toolbar">
+    <div>📅 <span id="currentDateLabel" class="date-label">2026-11-17 (화)</span></div>
+    <div class="btn-group">
+      <button id="btnNextDay" class="test-btn" title="앱 안의 오늘 날짜를 하루 넘깁니다">다음 날로 이동</button>
+      <button id="btnResetAll" class="test-btn" title="데이터를 초기화합니다">처음부터 다시</button>
+    </div>
+  </div>
+
+  <div class="main-content">
+    
+    <!-- 앱 헤더 -->
+    <header class="app-header">
+      <div class="app-title">🧚‍♀️ 공강 요정</div>
+      <div class="app-subtitle">짧은 틈새 공강도 알차고 재밌게!</div>
+    </header>
+
+    <!-- 5. 재조율 격려 및 알림 배너 -->
+    <div id="readjustBanner" class="re-adjust-banner"></div>
+
+    <!-- 4. 모니터링 대시보드 -->
+    <section class="monitor-card">
+      <div class="monitor-top">
+        <span id="levelBadge" class="badge-level">🌱 공강 새싹</span>
+        <span id="stampCount" class="stamp-count">⭐️ 스탬프 0개</span>
+      </div>
+      <div class="monitor-stats">
+        <div class="stat-item">
+          <div id="statTotalMinutes" class="stat-num">0분</div>
+          <div class="stat-label">알찬 공강 시간</div>
+        </div>
+        <div class="stat-item">
+          <div id="statCompletedCount" class="stat-num">0회</div>
+          <div class="stat-label">완료한 활동</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1. 입력값 섹션 -->
+    <section id="inputSection" class="section-card">
+      <div class="section-title">⏱️ 지금 공강 시간과 인원은?</div>
+      
+      <div style="font-size: 11px; color:#6b7280; margin-bottom: 5px; font-weight: 600;">남은 시간 선택</div>
+      <div class="btn-grid" id="timeGrid">
+        <button type="button" class="chip-btn" data-val="15">15분</button>
+        <button type="button" class="chip-btn" data-val="30">30분</button>
+        <button type="button" class="chip-btn" data-val="60">60분</button>
+        <button type="button" class="chip-btn" data-val="120">120분+</button>
+      </div>
+
+      <div style="font-size: 11px; color:#6b7280; margin-bottom: 5px; font-weight: 600;">함께할 인원 선택</div>
+      <div class="btn-grid btn-grid-3" id="peopleGrid">
+        <button type="button" class="chip-btn" data-val="1">혼자 (1인)</button>
+        <button type="button" class="chip-btn" data-val="2">둘이서 (2인)</button>
+        <button type="button" class="chip-btn" data-val="3">여럿이 (3인+)</button>
+      </div>
+
+      <div id="inputError" class="error-msg">시간과 인원을 먼저 선택해 주세요!</div>
+
+      <button id="btnGetRecommend" class="btn-primary">
+        ✨ 활동 추천받기
+      </button>
+    </section>
+
+    <!-- 2. 초안 생성 (추천 활동) -->
+    <section id="draftSection" class="section-card draft-container">
+      <div class="section-title">💡 오늘의 공강 추천 리스트</div>
+
+      <div class="draft-toolbar">
+        <button id="btnRoulette" class="btn-secondary">🎲 룰렛으로 딱 하나 뽑기</button>
+        <button id="btnRefreshActivities" class="btn-secondary">🔄 다른 활동 보기</button>
+      </div>
+
+      <div id="activityCardsContainer" style="display:flex; flex-direction:column; gap:8px;">
+        <!-- 활동 카드들이 JS로 동적 생성됨 -->
+      </div>
+    </section>
+
+    <!-- 3. 실행 기록 섹션 -->
+    <section id="recordSection" class="section-card record-container">
+      <div class="section-title">📝 오늘의 공강 미션 진행</div>
+
+      <div class="selected-mission-card">
+        <div id="selectedMissionTitle" class="mission-name">활동명</div>
+        <div id="selectedMissionDesc" class="mission-sub">설명</div>
+      </div>
+
+      <!-- 내장 15초 순발력 반응속도 미니게임 컨테이너 -->
+      <div id="miniGameContainer" style="display:none;">
+        <div style="font-size:11px; color:#4b5563; font-weight:700; margin-bottom:4px; text-align:center;">
+          ⚡ 즉석 인앱 미니게임: 반응속도 테스트
+        </div>
+        <div id="reactionGameBox" class="minigame-box">
+          여기를 눌러 게임 시작! (초록색이 되면 즉시 클릭)
+        </div>
+      </div>
+
+      <div class="satisfaction-title">활동을 마친 뒤 기분은 어땠나요?</div>
+      <div class="satis-grid" id="satisfactionGrid">
+        <button type="button" class="satis-btn" data-val="fun">
+          <span class="emoji">😄</span>
+          꿀잼!
+        </button>
+        <button type="button" class="satis-btn" data-val="normal">
+          <span class="emoji">😐</span>
+          무난함
+        </button>
+        <button type="button" class="satis-btn" data-val="sleepy">
+          <span class="emoji">😴</span>
+          잠만잠·지루
+        </button>
+      </div>
+
+      <div id="recordError" class="error-msg">만족도를 하나 선택해 주세요!</div>
+
+      <button id="btnSaveRecord" class="btn-primary ready" style="background:#10b981;">
+        ✅ 공강 활동 완료 기록하기
+      </button>
+
+      <button id="btnCancelMission" class="btn-cancel-mission" type="button">
+        ↩️ 취소하고 다른 활동 다시 고르기
+      </button>
+    </section>
+
+    <!-- 오늘의 활동 완료 축하 박스 -->
+    <div id="todayDoneBox" class="today-done-box">
+      <div class="done-title">🎉 오늘 공강 활동 완료!</div>
+      <div class="done-desc">
+        오늘 공강을 멋지게 보냈어요! 참 잘했어요 👏<br>
+        다음 공강 추천은 내일 다시 열립니다.
+      </div>
+    </div>
+
+    <!-- 최근 기록 목록 (모니터링) -->
+    <section class="section-card history-card">
+      <div class="section-title">📜 최근 공강 활동 기록</div>
+      <ul id="historyList" class="history-list">
+        <li class="empty-history">아직 저장된 활동 기록이 없습니다.</li>
+      </ul>
+    </section>
+
+  </div>
+</div>
+
+<script>
+  /* ============================================================
+     공강 요정 웹앱 로직 (순수 Vanilla JS + localStorage)
+     ============================================================ */
+
+  const STORAGE_KEY = "gonggang_app_data_v1";
+
+  // 활동 데이터베이스 (모든 조합에 최소 3~5개 보장)
+  const ACTIVITY_DB = {
+    "15_1": [
+      { id: "15_1_game", title: "⚡ 순발력 반응속도 미니게임", time: 15, isGame: true, desc: "앱 안에서 바로 탭해서 내 반응속도를 측정해보세요!" },
+      { id: "15_1_snack", title: "🥤 자판기 신상 음료 털기", time: 15, desc: "건물 자판기나 매점에 가서 안 마셔본 음료 한 캔 뽑아 마시기" },
+      { id: "15_1_stretch", title: "🧘 5분 창밖 멍때리기 & 목 스트레칭", time: 15, isHealing: true, desc: "스마트폰을 내려놓고 창밖을 보며 뭉친 어깨를 천천히 풀어줍니다." },
+      { id: "15_1_book", title: "📖 도서관 베스트셀러 훑기", time: 15, desc: "도서관 신간 서가에서 눈길 끄는 책 1권 제목과 목차 구경하기" },
+      { id: "15_1_tea", title: "☕ 따뜻한 음료 한 잔의 여유", time: 15, isHealing: true, desc: "온음료를 천천히 마시며 짧은 힐링 휴식 취하기" }
+    ],
+    "15_2": [
+      { id: "15_2_rps", title: "✌️ 3판 2선승 간식 내기 가위바위보", time: 15, desc: "매점 젤리나 캔커피 걸고 친구와 가위바위보 승부하기" },
+      { id: "15_2_song", title: "🎵 내 인생곡 교환해서 들어보기", time: 15, desc: "서로 이어폰 한 쪽씩 나눠 끼고 요즘 꽂힌 노래 들려주기" },
+      { id: "15_2_talk", title: "☕ 편의점 커피 테이크아웃 토크", time: 15, desc: "가장 가까운 편의점에서 커피 사며 오늘 수업 후기 나누기" },
+      { id: "15_2_heal", title: "🛋️ 휴게실 소파에서 멍때리기 토크", time: 15, isHealing: true, desc: "조용한 휴게실에서 편하게 기대어 쉬기" }
+    ],
+    "15_3": [
+      { id: "15_3_quiz", title: "📱 초간단 초성 퀴즈 대결", time: 15, desc: "영화/노래 제목 초성 하나 내고 3분 안에 맞히기" },
+      { id: "15_3_photo", title: "📸 3인 엽기 거울 셀카 남기기", time: 15, desc: "화장실이나 복도 거울에서 오늘을 기념하는 웃긴 사진 찍기" },
+      { id: "15_3_ladder", title: "🎯 모바일 사다리타기 음료 셔틀", time: 15, desc: "단톡방 사다리타기로 음료수 사 올 사람 정하기" },
+      { id: "15_3_heal", title: "벤치에서 비타민D 합성", time: 15, isHealing: true, desc: "캠퍼스 벤치에 모여 앉아 햇볕 쬐며 쉬기" }
+    ],
+    "30_1": [
+      { id: "30_1_walk", title: "🎧 음악 들으며 캠퍼스 산책 한 바퀴", time: 30, desc: "좋아하는 플레이리스트를 켜고 안 가본 건물 둘레길 걷기" },
+      { id: "30_1_nap", title: "🛋️ 도서관 소파에서 20분 파워 낮잠", time: 30, isHealing: true, desc: "알람 맞추고 편안한 도서관 라운지에서 꿀잠 자며 뇌 충전하기" },
+      { id: "30_1_homework", title: "📝 다음 시간 과제 15분 번개 완료", time: 30, desc: "출석 점수 걸린 간단한 과제나 자료 미리 다운로드하기" },
+      { id: "30_1_shop", title: "🛒 학교 앞 문구점/다이소 핫템 구경", time: 30, desc: "귀여운 스티커나 실용적인 소품 둘러보기" }
+    ],
+    "30_2": [
+      { id: "30_2_cafe", title: "☕ 캠퍼스 카페 꿀자리 찾아 수다", time: 30, desc: "햇볕 잘 드는 창가 자리에 앉아 최근 근황 털어놓기" },
+      { id: "30_2_game", title: "🎮 모바일 캐주얼 1:1 대결", time: 30, desc: "모바일 게임(캐치마인드, 모두의마블 등)으로 승부 겨루기" },
+      { id: "30_2_pingpong", title: "🏓 학생회관 탁구장 한 판", time: 30, desc: "학생회관 탁구대에서 11점 내기 가벼운 핑퐁 경기" },
+      { id: "30_2_heal", title: "🌿 교정 잔디밭 돗자리 휴식", time: 30, isHealing: true, desc: "햇살 아래서 편안하게 누워 쉬기" }
+    ],
+    "30_3": [
+      { id: "30_3_snack", title: "🥪 학생식당 간식 타임", time: 30, desc: "토스트나 라면 한 그릇 나눠 먹으며 공강 채우기" },
+      { id: "30_3_card", title: "🃏 추억의 원카드/도둑잡기", time: 30, desc: "동아리방이나 과방에 있는 트럼프 카드로 초집중 카드 게임" },
+      { id: "30_3_view", title: "🌿 학과 건물 옥상/테라스 뷰 감상", time: 30, desc: "시원한 바람 쐬며 학교 전경 내려다보기" },
+      { id: "30_3_heal", title: "🥤 카페 테라스 힐링 수다", time: 30, isHealing: true, desc: "바람 솔솔 부는 테라스에서 음료 한 잔하기" }
+    ],
+    "60_1": [
+      { id: "60_1_food", title: "🍱 학교 앞 숨은 맛집 혼밥 도전", time: 60, desc: "평소 가보고 싶었던 골목 식당에서 여유로운 한 끼 즐기기" },
+      { id: "60_1_video", title: "🎬 카페에서 넷플릭스/유튜브 1편", time: 60, desc: "달콤한 음료 마시며 미뤄뒀던 영상 1편 몰입 감상하기" },
+      { id: "60_1_sleep", title: "😴 도서관 수면실에서 딥슬립", time: 60, isHealing: true, desc: "수면존이나 편안한 쉼터에서 깊은 휴식 취하기" },
+      { id: "60_1_walk", title: "🚶 캠퍼스 외곽 둘레길 파워워킹", time: 60, desc: "가벼운 유산소 운동으로 찌뿌둥한 몸 풀기" }
+    ],
+    "60_2": [
+      { id: "60_2_karaoke", title: "🎤 코인노래방 6곡 열창 배틀", time: 60, desc: "학교 앞 코인노래방에서 스트레스 싹 날리기" },
+      { id: "60_2_billiards", title: "🎱 포켓볼/당구 점수 내기", time: 60, desc: "친구와 함께 긴장감 넘치는 포켓볼 한 게임" },
+      { id: "60_2_tteok", title: "🍲 즉석 떡볶이 골목 정복", time: 60, desc: "치즈 볶음밥까지 야무지게 먹는 풀코스 공강 식사" },
+      { id: "60_2_heal", title: "🛋️ 만화카페 1시간 힐링", time: 60, isHealing: true, desc: "아늑한 굴방에서 만화책 보며 편하게 쉬기" }
+    ],
+    "60_3": [
+      { id: "60_3_board", title: "🎲 보드게임 카페 1시간 스피드런", time: 60, desc: "루미큐브나 달무티 등 3인 이상 꿀잼 게임 달리기" },
+      { id: "60_3_arcade", title: "🕹️ 오락실 펌프 & 농구공 던지기", time: 60, desc: "오락실에서 신나게 몸 쓰며 최고 기록 갱신하기" },
+      { id: "60_3_eat", title: "🍕 맛있는 피자/치킨 점심 파티", time: 60, desc: "동아리방이나 식당에서 다 함께 든든하게 먹기" },
+      { id: "60_3_heal", title: "☕ 대형 베이커리 카페 단체 힐링", time: 60, isHealing: true, desc: "넓은 소파에서 디저트 먹으며 쉬기" }
+    ],
+    "120_1": [
+      { id: "120_1_movie", title: "🍿 근처 영화관에서 영화 한 편", time: 120, desc: "긴 공강을 활용해 상영 중인 최신 영화 여유롭게 감상" },
+      { id: "120_1_comic", title: "📚 만화카페에서 뒹굴거리기", time: 120, desc: "라면 먹으면서 보고 싶었던 웹툰/만화책 정주행" },
+      { id: "120_1_bike", title: "🚲 공공자전거 라이딩", time: 120, desc: "근처 천변이나 공원까지 자전거 타고 다녀오기" },
+      { id: "120_1_spa", title: "🧖 사우나/힐링 카페 릴렉스", time: 120, isHealing: true, desc: "따뜻한 온열 마사지나 휴식으로 피로 완전히 풀기" }
+    ],
+    "120_2": [
+      { id: "120_2_escape", title: "🔐 방탈출 카페 도전", time: 120, desc: "학교 근처 방탈출 테마 하나 잡고 브레인 풀가동" },
+      { id: "120_2_bowling", title: "🎳 볼링장 2게임 승부", time: 120, desc: "스트라이크 터뜨리며 볼링비 내기 대결" },
+      { id: "120_2_mall", title: "🛍️ 인근 대형 쇼핑몰/백화점 투어", time: 120, desc: "맛있는 음식 먹고 다양한 팝업 스토어 구경하기" },
+      { id: "120_2_heal", title: "☕ 뷰 좋은 근교 감성 카페", time: 120, isHealing: true, desc: "조금 멀리 나가서 여유롭게 힐링하기" }
+    ],
+    "120_3": [
+      { id: "120_3_escape", title: "🔐 방탈출 or 보드게임 풀코스", time: 120, desc: "여럿이 머리 맞대고 꿀잼 미션 클리어하기" },
+      { id: "120_3_picnic", title: "🍕 잔디밭 돗자리 피크닉 & 배달음식", time: 120, desc: "피자나 치킨 시켜서 햇살 받으며 대학 낭만 즐기기" },
+      { id: "120_3_pc", title: "🖥️ PC방 5인큐 랭크 게임", time: 120, desc: "협곡이나 전장에서 친구들과 팀워크 맞추기" },
+      { id: "120_3_heal", title: "🎪 룸카페 보드게임 & 영화 정주행", time: 120, isHealing: true, desc: "아늑한 룸에서 간식 먹으며 편안하게 놀기" }
+    ]
+  };
+
+  // 기본 상태값
+  const defaultState = {
+    currentDate: "2026-11-17",
+    totalMinutes: 0,
+    completedCount: 0,
+    stamps: 0,
+    lastSatisfaction: null,     // "fun" | "normal" | "sleepy"
+    todayCompleted: false,      // 오늘 완료 여부
+    todaySelectedMission: null, // 진행 중인 미션
+    yesterdayHadRecord: true,   // 전날 기록 여부
+    records: []                 // [{ id, date, title, time, satisfaction }]
+  };
+
+  let state = { ...defaultState };
+
+  // 상태 로드
+  function loadState() {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        state = { ...defaultState, ...JSON.parse(saved) };
+      }
+    } catch (e) {
+      console.error("데이터 로드 실패:", e);
+      state = { ...defaultState };
+    }
+  }
+
+  // 상태 저장
+  function saveState() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (e) {
+      console.error("데이터 저장 실패:", e);
+    }
+  }
+
+  // 날짜 안전 파싱 헬퍼
+  function parseDateSafe(dateStr) {
+    const parts = dateStr.split("-").map(Number);
+    return new Date(parts[0], parts[1] - 1, parts[2]);
+  }
+
+  // DOM 요소 참조
+  const currentDateLabel = document.getElementById("currentDateLabel");
+  const btnNextDay = document.getElementById("btnNextDay");
+  const btnResetAll = document.getElementById("btnResetAll");
+
+  const readjustBanner = document.getElementById("readjustBanner");
+  const levelBadge = document.getElementById("levelBadge");
+  const stampCount = document.getElementById("stampCount");
+  const statTotalMinutes = document.getElementById("statTotalMinutes");
+  const statCompletedCount = document.getElementById("statCompletedCount");
+
+  const inputSection = document.getElementById("inputSection");
+  const timeGrid = document.getElementById("timeGrid");
+  const peopleGrid = document.getElementById("peopleGrid");
+  const inputError = document.getElementById("inputError");
+  const btnGetRecommend = document.getElementById("btnGetRecommend");
+
+  const draftSection = document.getElementById("draftSection");
+  const activityCardsContainer = document.getElementById("activityCardsContainer");
+  const btnRoulette = document.getElementById("btnRoulette");
+  const btnRefreshActivities = document.getElementById("btnRefreshActivities");
+
+  const recordSection = document.getElementById("recordSection");
+  const selectedMissionTitle = document.getElementById("selectedMissionTitle");
+  const selectedMissionDesc = document.getElementById("selectedMissionDesc");
+  const satisfactionGrid = document.getElementById("satisfactionGrid");
+  const recordError = document.getElementById("recordError");
+  const btnSaveRecord = document.getElementById("btnSaveRecord");
+  const btnCancelMission = document.getElementById("btnCancelMission");
+  const todayDoneBox = document.getElementById("todayDoneBox");
+
+  const miniGameContainer = document.getElementById("miniGameContainer");
+  const reactionGameBox = document.getElementById("reactionGameBox");
+  const historyList = document.getElementById("historyList");
+
+  // 현재 선택된 임시 입력값
+  let selectedTime = null;
+  let selectedPeople = null;
+  let currentActivities = [];
+  let selectedSatisfaction = null;
+
+  const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
+
+  /* ============================================================
+     렌더링 함수들
+     ============================================================ */
+
+  function render() {
+    // 1. 상단 날짜 (타임존 안전 파싱)
+    const d = parseDateSafe(state.currentDate);
+    const dayName = isNaN(d.getDay()) ? "화" : dayNames[d.getDay()];
+    currentDateLabel.textContent = `${state.currentDate} (${dayName})`;
+
+    // 2. 모니터링 대시보드
+    statTotalMinutes.textContent = `${state.totalMinutes.toLocaleString()}분`;
+    statCompletedCount.textContent = `${state.completedCount}회`;
+    stampCount.textContent = `⭐️ 스탬프 ${state.stamps}개`;
+
+    // 레벨 판단 규칙: 0~59분 새싹 / 60~179분 러너 / 180분+ 마스터
+    if (state.totalMinutes >= 180) {
+      levelBadge.textContent = "👑 공강 마스터";
+      levelBadge.style.background = "rgba(251, 191, 36, 0.35)";
+    } else if (state.totalMinutes >= 60) {
+      levelBadge.textContent = "🌿 공강 러너";
+      levelBadge.style.background = "rgba(52, 211, 153, 0.35)";
+    } else {
+      levelBadge.textContent = "🌱 공강 새싹";
+      levelBadge.style.background = "rgba(255, 255, 255, 0.2)";
+    }
+
+    // 3. 재조율 배너 표시 규칙 (오늘 활동 미완료 상태에서만 노출)
+    if (!state.todayCompleted && !state.yesterdayHadRecord) {
+      readjustBanner.style.display = "block";
+      readjustBanner.innerHTML = "📢 <strong>어제는 공강이 훌쩍 지나갔네요!</strong><br>오늘은 15분 가벼운 틈새 미션부터 시동을 걸어볼까요?";
+    } else if (!state.todayCompleted && state.lastSatisfaction === "sleepy") {
+      readjustBanner.style.display = "block";
+      readjustBanner.innerHTML = "💤 <strong>요즘 많이 피곤하셨군요!</strong><br>오늘 추천 목록에는 충전과 휴식을 돕는 힐링 코스를 먼저 준비했어요.";
+    } else {
+      readjustBanner.style.display = "none";
+    }
+
+    // 4. 화면 상태 제어 (입력 vs 추천 vs 진행 중 vs 오늘 완료)
+    if (state.todayCompleted) {
+      inputSection.style.display = "none";
+      draftSection.style.display = "none";
+      recordSection.style.display = "none";
+      todayDoneBox.style.display = "block";
+    } else if (state.todaySelectedMission) {
+      inputSection.style.display = "none";
+      draftSection.style.display = "none";
+      todayDoneBox.style.display = "none";
+      recordSection.style.display = "flex";
+      renderSelectedMission();
+    } else {
+      todayDoneBox.style.display = "none";
+      recordSection.style.display = "none";
+      inputSection.style.display = "block";
+    }
+
+    // 추천받기 버튼 활성화 상태 표시
+    if (selectedTime && selectedPeople) {
+      btnGetRecommend.classList.add("ready");
+    } else {
+      btnGetRecommend.classList.remove("ready");
+    }
+
+    // 5. 최근 기록 리스트 렌더링
+    renderHistory();
+  }
+
+  function renderHistory() {
+    historyList.innerHTML = "";
+    if (state.records.length === 0) {
+      historyList.innerHTML = `<li class="empty-history">아직 저장된 활동 기록이 없습니다.</li>`;
+      return;
+    }
+
+    const recentRecords = [...state.records].reverse().slice(0, 10);
+    recentRecords.forEach(rec => {
+      const li = document.createElement("li");
+      li.className = "history-item";
+
+      const satisEmoji = rec.satisfaction === "fun" ? "😄 꿀잼" :
+                         rec.satisfaction === "sleepy" ? "😴 피곤" : "😐 무난";
+
+      li.innerHTML = `
+        <div class="history-left">
+          <span class="history-date">${rec.date}</span>
+          <span class="history-title">${rec.title}</span>
+        </div>
+        <div class="history-right">
+          <span style="color:#4f46e5;">+${rec.time}분</span>
+          <span>${satisEmoji}</span>
+          <button class="btn-delete-rec" data-id="${rec.id}" title="이 기록 삭제">✕</button>
+        </div>
+      `;
+      historyList.appendChild(li);
+    });
+
+    // 개별 기록 삭제 이벤트 연결 (경계 조건: 잘못 넣은 기록 복원)
+    historyList.querySelectorAll(".btn-delete-rec").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        const idToDelete = e.currentTarget.getAttribute("data-id");
+        deleteRecord(idToDelete);
+      });
+    });
+  }
+
+  // 기록 삭제 기능
+  function deleteRecord(recId) {
+    const targetIdx = state.records.findIndex(r => String(r.id) === String(recId));
+    if (targetIdx === -1) return;
+
+    const ok = confirm("이 활동 기록을 삭제할까요? 누적 시간과 통계가 되돌려집니다.");
+    if (!ok) return;
+
+    const removed = state.records[targetIdx];
+    state.records.splice(targetIdx, 1);
+
+    state.totalMinutes = Math.max(0, state.totalMinutes - removed.time);
+    state.completedCount = Math.max(0, state.completedCount - 1);
+    state.stamps = Math.max(0, state.stamps - 1);
+
+    // 삭제한 기록이 오늘 날짜였다면 오늘 완료 상태 해제하여 재시도 허용
+    if (removed.date === state.currentDate) {
+      state.todayCompleted = false;
+    }
+
+    // 직전 만족도 재계산
+    if (state.records.length > 0) {
+      state.lastSatisfaction = state.records[state.records.length - 1].satisfaction;
+    } else {
+      state.lastSatisfaction = null;
+    }
+
+    saveState();
+    render();
+  }
+
+  /* ============================================================
+     1. 입력값 이벤트 처리
+     ============================================================ */
+
+  // 시간 칩 선택
+  timeGrid.addEventListener("click", (e) => {
+    if (e.target.classList.contains("chip-btn")) {
+      timeGrid.querySelectorAll(".chip-btn").forEach(btn => btn.classList.remove("active"));
+      e.target.classList.add("active");
+      selectedTime = parseInt(e.target.getAttribute("data-val"), 10);
+      inputError.style.display = "none";
+      render();
+    }
+  });
+
+  // 인원 칩 선택
+  peopleGrid.addEventListener("click", (e) => {
+    if (e.target.classList.contains("chip-btn")) {
+      peopleGrid.querySelectorAll(".chip-btn").forEach(btn => btn.classList.remove("active"));
+      e.target.classList.add("active");
+      selectedPeople = parseInt(e.target.getAttribute("data-val"), 10);
+      inputError.style.display = "none";
+      render();
+    }
+  });
+
+  // 추천받기 버튼 클릭
+  btnGetRecommend.addEventListener("click", () => {
+    if (!selectedTime || !selectedPeople) {
+      inputError.style.display = "block";
+      return;
+    }
+    inputError.style.display = "none";
+    generateDrafts();
+  });
+
+  /* ============================================================
+     2. 초안 생성 (추천 활동)
+     ============================================================ */
+
+  function generateDrafts() {
+    const key = `${selectedTime}_${selectedPeople}`;
+    let pool = ACTIVITY_DB[key] || ACTIVITY_DB["15_1"];
+
+    // 재조율 규칙: 직전 만족도가 sleepy였다면 힐링 코스를 우선 배치
+    let sortedPool = [...pool];
+    if (state.lastSatisfaction === "sleepy") {
+      sortedPool.sort((a, b) => (b.isHealing ? 1 : 0) - (a.isHealing ? 1 : 0));
+    } else {
+      sortedPool.sort(() => Math.random() - 0.5);
+    }
+
+    currentActivities = sortedPool.slice(0, 3);
+    renderActivityCards(currentActivities);
+    draftSection.style.display = "flex";
+    draftSection.scrollIntoView({ behavior: "smooth" });
+  }
+
+  function renderActivityCards(acts) {
+    activityCardsContainer.innerHTML = "";
+    acts.forEach((act, idx) => {
+      const card = document.createElement("div");
+      const isHealingTop = idx === 0 && act.isHealing && state.lastSatisfaction === "sleepy";
+      card.className = "activity-card" + (isHealingTop ? " featured" : "");
+      card.id = `actCard_${idx}`;
+
+      card.innerHTML = `
+        <div class="activity-header">
+          <div class="activity-title">
+            ${act.title} ${isHealingTop ? "<span style='font-size:10px; color:#6366f1;'>[힐링추천]</span>" : ""}
+          </div>
+          <span class="activity-time-tag">${act.time}분 코스</span>
+        </div>
+        <div class="activity-desc">${act.desc}</div>
+        <button type="button" class="btn-select-act" data-index="${idx}">
+          👉 이걸로 할래요!
+        </button>
+      `;
+      activityCardsContainer.appendChild(card);
+    });
+
+    // 선택 버튼 이벤트 연결
+    activityCardsContainer.querySelectorAll(".btn-select-act").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        const idx = parseInt(e.currentTarget.getAttribute("data-index"), 10);
+        selectMission(currentActivities[idx]);
+      });
+    });
+  }
+
+  // 다른 활동 보기 (새로고침)
+  btnRefreshActivities.addEventListener("click", () => {
+    generateDrafts();
+  });
+
+  // 룰렛으로 딱 하나 뽑기
+  btnRoulette.addEventListener("click", () => {
+    if (currentActivities.length === 0) return;
+    btnRoulette.disabled = true;
+
+    // 룰렛 회전 중에는 선택 버튼 임시 비활성화
+    const selectBtns = activityCardsContainer.querySelectorAll(".btn-select-act");
+    selectBtns.forEach(b => b.disabled = true);
+
+    let count = 0;
+    const maxCount = 10;
+    const interval = setInterval(() => {
+      const randomIdx = Math.floor(Math.random() * currentActivities.length);
+      activityCardsContainer.querySelectorAll(".activity-card").forEach((c, i) => {
+        c.classList.toggle("highlight", i === randomIdx);
+      });
+      count++;
+      if (count >= maxCount) {
+        clearInterval(interval);
+        btnRoulette.disabled = false;
+        selectBtns.forEach(b => b.disabled = false);
+        const finalIdx = Math.floor(Math.random() * currentActivities.length);
+        activityCardsContainer.querySelectorAll(".activity-card").forEach((c, i) => {
+          c.classList.toggle("highlight", i === finalIdx);
+        });
+      }
+    }, 100);
+  });
+
+  /* ============================================================
+     3. 실행 기록 로직
+     ============================================================ */
+
+  function selectMission(activity) {
+    state.todaySelectedMission = {
+      title: activity.title,
+      time: activity.time,
+      desc: activity.desc,
+      isGame: !!activity.isGame
+    };
+    saveState();
+    render();
+    recordSection.scrollIntoView({ behavior: "smooth" });
+  }
+
+  function renderSelectedMission() {
+    const mission = state.todaySelectedMission;
+    if (!mission) return;
+
+    selectedMissionTitle.textContent = mission.title;
+    selectedMissionDesc.textContent = `${mission.time}분 공강 미션 • ${mission.desc}`;
+
+    // 인앱 미니게임 여부 처리
+    if (mission.isGame) {
+      miniGameContainer.style.display = "block";
+      initMiniGame();
+    } else {
+      miniGameContainer.style.display = "none";
+    }
+
+    // 만족도 버튼 초기화
+    selectedSatisfaction = null;
+    satisfactionGrid.querySelectorAll(".satis-btn").forEach(b => b.classList.remove("active"));
+    recordError.style.display = "none";
+  }
+
+  // 취소하고 다른 활동 다시 고르기 버튼
+  btnCancelMission.addEventListener("click", () => {
+    state.todaySelectedMission = null;
+    saveState();
+    render();
+    draftSection.style.display = "flex";
+    draftSection.scrollIntoView({ behavior: "smooth" });
+  });
+
+  // 만족도 버튼 클릭
+  satisfactionGrid.addEventListener("click", (e) => {
+    const btn = e.target.closest(".satis-btn");
+    if (btn) {
+      satisfactionGrid.querySelectorAll(".satis-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      selectedSatisfaction = btn.getAttribute("data-val");
+      recordError.style.display = "none";
+    }
+  });
+
+  // 활동 완료 기록 저장
+  btnSaveRecord.addEventListener("click", () => {
+    if (!selectedSatisfaction) {
+      recordError.style.display = "block";
+      return;
+    }
+    recordError.style.display = "none";
+
+    const mission = state.todaySelectedMission;
+    const gainedTime = mission ? mission.time : 15;
+
+    state.totalMinutes += gainedTime;
+    state.completedCount += 1;
+    state.stamps += 1;
+    state.lastSatisfaction = selectedSatisfaction;
+    state.todayCompleted = true;
+    state.yesterdayHadRecord = true; // 오늘 기록을 남겼으므로
+
+    state.records.push({
+      id: Date.now() + "_" + Math.random().toString(36).substr(2, 5),
+      date: state.currentDate,
+      title: mission.title,
+      time: gainedTime,
+      satisfaction: selectedSatisfaction
+    });
+
+    state.todaySelectedMission = null;
+    saveState();
+    render();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  /* ============================================================
+     인앱 순발력 반응속도 미니게임
+     ============================================================ */
+  let gameTimeout = null;
+  let gameStartTime = 0;
+  let gameStatus = "idle"; // "idle" | "waiting" | "ready"
+
+  function initMiniGame() {
+    clearTimeout(gameTimeout);
+    gameStatus = "idle";
+    reactionGameBox.className = "minigame-box";
+    reactionGameBox.textContent = "여기를 눌러 반응속도 측정 시작! (초록색이 되면 탭)";
+  }
+
+  reactionGameBox.addEventListener("click", () => {
+    if (gameStatus === "idle") {
+      gameStatus = "waiting";
+      reactionGameBox.className = "minigame-box waiting";
+      reactionGameBox.textContent = "준비... 초록색으로 변할 때까지 대기!";
+
+      const delay = Math.floor(Math.random() * 2000) + 1500;
+      gameTimeout = setTimeout(() => {
+        gameStatus = "ready";
+        gameStartTime = Date.now();
+        reactionGameBox.className = "minigame-box ready";
+        reactionGameBox.textContent = "지금 탭하세요!! 💥";
+      }, delay);
+
+    } else if (gameStatus === "waiting") {
+      clearTimeout(gameTimeout);
+      gameStatus = "idle";
+      reactionGameBox.className = "minigame-box";
+      reactionGameBox.textContent = "너무 빨리 눌렀어요! 😅 다시 눌러 도전하기";
+
+    } else if (gameStatus === "ready") {
+      const reactionTime = Date.now() - gameStartTime;
+      gameStatus = "idle";
+      reactionGameBox.className = "minigame-box";
+      reactionGameBox.textContent = `⚡ 반응속도: ${reactionTime}ms! 대단해요! (다시 하려면 탭)`;
+    }
+  });
+
+  /* ============================================================
+     테스트용 도구 버튼 2개
+     1) 다음 날로 이동
+     2) 처음부터 다시
+     ============================================================ */
+
+  // 1) 다음 날로 이동
+  btnNextDay.addEventListener("click", () => {
+    // 오늘 완료했는지 여부를 yesterdayHadRecord에 반영
+    state.yesterdayHadRecord = state.todayCompleted;
+
+    // 날짜 안전 계산
+    const cur = parseDateSafe(state.currentDate);
+    cur.setDate(cur.getDate() + 1);
+    const yyyy = cur.getFullYear();
+    const mm = String(cur.getMonth() + 1).padStart(2, '0');
+    const dd = String(cur.getDate()).padStart(2, '0');
+    state.currentDate = `${yyyy}-${mm}-${dd}`;
+
+    // 다음 날 상태 초기화
+    state.todayCompleted = false;
+    state.todaySelectedMission = null;
+    selectedTime = null;
+    selectedPeople = null;
+    timeGrid.querySelectorAll(".chip-btn").forEach(b => b.classList.remove("active"));
+    peopleGrid.querySelectorAll(".chip-btn").forEach(b => b.classList.remove("active"));
+
+    saveState();
+    render();
+  });
+
+  // 2) 처음부터 다시
+  btnResetAll.addEventListener("click", () => {
+    const ok = confirm("정말로 저장된 모든 데이터를 지우고 처음부터 다시 시작할까요?");
+    if (ok) {
+      localStorage.removeItem(STORAGE_KEY);
+      state = { ...defaultState };
+      selectedTime = null;
+      selectedPeople = null;
+      currentActivities = [];
+      timeGrid.querySelectorAll(".chip-btn").forEach(b => b.classList.remove("active"));
+      peopleGrid.querySelectorAll(".chip-btn").forEach(b => b.classList.remove("active"));
+      saveState();
+      render();
+    }
+  });
+
+  // 앱 시작 초기화
+  loadState();
+  render();
+</script>
+</body>
+</html>
